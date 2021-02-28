@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import java.awt.*;
+import java.time.LocalDateTime;
 import java.util.StringTokenizer;
 
 import static com.siyeh.ig.psiutils.ExpressionUtils.isNullLiteral;
