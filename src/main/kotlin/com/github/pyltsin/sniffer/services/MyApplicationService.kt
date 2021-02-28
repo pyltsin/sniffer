@@ -1,6 +1,6 @@
-package org.jetbrains.plugins.template.services
+package com.github.pyltsin.sniffer.services
 
-import org.jetbrains.plugins.template.MyBundle
+import com.github.pyltsin.sniffer.MyBundle
 
 class MyApplicationService {
 
