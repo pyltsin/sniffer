@@ -1,19 +1,23 @@
 <idea-plugin>
     <id>com.github.pyltsin.sniffer</id>
-    <name>sniffer</name>
+    <name>Sniffer (Inspections)</name>
     <vendor>pyltsin</vendor>
 
     <!-- Product and plugin compatibility requirements -->
     <!-- https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
-    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.java</depends>
+
+    <description><![CDATA[Basic sniffer. Using for finding a strange part of codes]]></description>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.pyltsin.sniffer.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.pyltsin.sniffer.services.MyProjectService"/>
+        <localInspection language="JAVA"
+                         displayName="SDK: Using HashMap with default hashcode"
+                         groupPath="Java"
+                         groupBundle="messages.InspectionsBundle"
+                         groupKey="group.names.probable.bugs"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.github.pyltsin.sniffer.ComparingReferencesInspection"/>
     </extensions>
-
-    <applicationListeners>
-        <listener class="com.github.pyltsin.sniffer.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </applicationListeners>
 </idea-plugin>
