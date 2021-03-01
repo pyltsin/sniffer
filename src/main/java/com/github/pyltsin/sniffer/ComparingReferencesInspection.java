@@ -7,24 +7,33 @@ import com.intellij.codeInspection.InspectionsBundle;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.lang.jvm.JvmMethod;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaElementVisitor;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.JavaTokenType;
 import com.intellij.psi.PsiBinaryExpression;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiExpression;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiMethodCallExpression;
+import com.intellij.psi.PsiMethodReferenceUtil;
 import com.intellij.psi.PsiNewExpression;
 import com.intellij.psi.PsiPrefixExpression;
 import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.util.PsiClassUtil;
+import com.intellij.psi.util.PsiSuperMethodUtil;
+import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IncorrectOperationException;
+import com.siyeh.HardcodedMethodConstants;
+import com.siyeh.ig.psiutils.MethodUtils;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +41,11 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import java.awt.*;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.siyeh.ig.psiutils.ExpressionUtils.isNullLiteral;
 
@@ -62,7 +75,11 @@ public class ComparingReferencesInspection extends AbstractBaseJavaLocalInspecti
         CHECKED_CLASSES = checkedClasses.getText();
       }
     });
-    panel.add(checkedClasses);
+
+//    Stream.of(1, 2).collect(Collectors.toMap(t -> t, t -> t))
+//            .forEach((t, i)-> System.out.println(t));
+//    Stream.of(1, 2).;
+//    panel.add(checkedClasses);
     Integer i = 0;
     synchronized (i) {
 
@@ -87,8 +104,18 @@ public class ComparingReferencesInspection extends AbstractBaseJavaLocalInspecti
 
       @Override
       public void visitNewExpression(PsiNewExpression expression) {
-        String canonicalText = expression.getClassOrAnonymousClassReference().getParameterList().getTypeArguments()[0].getCanonicalText();
+        final PsiType typeArgument = expression.getClassOrAnonymousClassReference().getParameterList().getTypeArguments()[0];
 
+        final PsiClass psiClass = PsiTypesUtil.getPsiClass(typeArgument);
+        final PsiMethod[] methodsByName = psiClass.findMethodsByName(HardcodedMethodConstants.HASH_CODE, true);
+        final List<PsiMethod> collect = Arrays.stream(methodsByName).filter(
+                it -> MethodUtils.isHashCode(it)
+        ).filter(it -> !it.getContainingClass().getQualifiedName().equals(""))
+                .collect(Collectors.toList());
+        collect.stream().forEach(method-> {
+          System.out.println(method.getContainingClass().getQualifiedName());
+          System.out.println(method.getName());
+        });
         super.visitNewExpression(expression);
       }
 
