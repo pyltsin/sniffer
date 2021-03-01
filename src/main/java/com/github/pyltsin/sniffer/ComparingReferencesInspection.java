@@ -18,6 +18,7 @@ import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiExpression;
 import com.intellij.psi.PsiMethodCallExpression;
+import com.intellij.psi.PsiNewExpression;
 import com.intellij.psi.PsiPrefixExpression;
 import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.PsiType;
@@ -83,6 +84,13 @@ public class ComparingReferencesInspection extends AbstractBaseJavaLocalInspecti
   @Override
   public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
     return new JavaElementVisitor() {
+
+      @Override
+      public void visitNewExpression(PsiNewExpression expression) {
+        String canonicalText = expression.getClassOrAnonymousClassReference().getParameterList().getTypeArguments()[0].getCanonicalText();
+
+        super.visitNewExpression(expression);
+      }
 
       /**
        * This string defines the short message shown to a user signaling the inspection found a problem.
