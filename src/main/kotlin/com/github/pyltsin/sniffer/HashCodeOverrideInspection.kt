@@ -89,7 +89,6 @@ class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
                     return
                 }
 
-
                 //check known Collectors
                 val expressions = expression.argumentList.expressions
                 if (expressions.size != 1) {
