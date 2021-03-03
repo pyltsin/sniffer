@@ -12,12 +12,12 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <localInspection language="JAVA"
-                         displayName="SDK: Using HashMap with default hashcode"
+                         displayName="Sniffer: Using HashMap with default hashcode"
                          groupPath="Java"
-                         groupBundle="messages.InspectionsBundle"
-                         groupKey="group.names.probable.bugs"
+                         groupBundle="messages.SnifferInspectionsBundle"
+                         groupKey="group.names.sniffer.probable.bugs"
                          enabledByDefault="true"
-                         level="WARNING"
-                         implementationClass="com.github.pyltsin.sniffer.ComparingReferencesInspection"/>
+                         level="WEAK WARNING"
+                         implementationClass="com.github.pyltsin.sniffer.HashCodeOverrideInspection"/>
     </extensions>
 </idea-plugin>
