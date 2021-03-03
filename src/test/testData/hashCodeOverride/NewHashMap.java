@@ -4,7 +4,7 @@ import java.util.Map;
 public class NewHashMap {
     public static void main(String[] args) {
         HashMap<String, String> stringStringHashMap = new HashMap<>();
-        Map<Runnable, String> runnableStringHashMap = <weak_warning descr="Don't contain overrided hashCode()">new HashMap<>()</weak_warning>;
+        Map<Runnable, String> runnableStringHashMap = <weak_warning descr="Class 'java.lang.Runnable' doesnt contain overrided hashCode()">new HashMap<>()</weak_warning>;
         Map<Clazz2, String> clazzStringHashMap = new HashMap<>();
     }
 
