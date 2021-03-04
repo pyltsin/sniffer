@@ -30,6 +30,8 @@ class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
         CallMatcher.staticCall(JAVA_UTIL_STREAM_COLLECTORS, "toConcurrentMap"),
     )
 
+    private val mapOf: CallMatcher = CallMatcher.staticCall(JAVA_UTIL_MAP, "of")
+
     override fun createOptionsPanel(): JComponent {
         val panel = JPanel(BorderLayout())
         val checkBox = CheckBox(
@@ -74,7 +76,24 @@ class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
             override fun visitMethodCallExpression(expression: PsiMethodCallExpression?) {
                 super.visitMethodCallExpression(expression)
 
-                if (expression == null || !streamCollectMatcher.matches(expression)) {
+                if (expression == null) {
+                    return
+                }
+
+                //Map.of
+                if (mapOf.matches(expression)) {
+                    val hashMapKey = getKeyTypeMethodParameter(expression, setOf(JAVA_UTIL_MAP))
+                    if (hashMapKey != null && !hasOverrideHashCode(hashMapKey)) {
+                        holder.registerProblem(
+                            expression,
+                            SnifferInspectionBundle.message(HASH_CODE_NOT_OVERRIDE_MESSAGE, hashMapKey.canonicalText)
+                        )
+                        return
+                    }
+                }
+
+                //Stream.collect
+                if (!streamCollectMatcher.matches(expression)) {
                     return
                 }
 

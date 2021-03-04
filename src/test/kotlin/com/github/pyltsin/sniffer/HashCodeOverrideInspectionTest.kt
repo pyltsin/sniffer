@@ -13,12 +13,36 @@ class HashCodeOverrideInspectionTest : LightJavaInspectionTestCase() {
 
     fun testNewHashMap() {
         myFixture.configureByFile("NewHashMap.java")
-        myFixture.enableInspections(HashCodeOverrideInspection())
+        myFixture.enableInspections(HashCodeOverrideInspection().also { it.m_allowedSuperHashMap = true })
         myFixture.testHighlighting(false, false, true)
     }
 
     fun testNewHashMapOverrided() {
         myFixture.configureByFile("NewHashMapOverrided.java")
+        myFixture.enableInspections(HashCodeOverrideInspection().also { it.m_allowedSuperHashMap = false })
+        myFixture.testHighlighting(false, false, true)
+    }
+
+    fun testStream() {
+        myFixture.configureByFile("StreamHashMap.java")
+        myFixture.enableInspections(HashCodeOverrideInspection().also { it.m_allowedSuperHashMap = true })
+        myFixture.testHighlighting(false, false, true)
+    }
+
+    fun testStreamOverrided() {
+        myFixture.configureByFile("StreamHashMapOverrided.java")
+        myFixture.enableInspections(HashCodeOverrideInspection().also { it.m_allowedSuperHashMap = false })
+        myFixture.testHighlighting(false, false, true)
+    }
+
+    fun testMapOf() {
+        myFixture.configureByFile("MapOfHashMap.java")
+        myFixture.enableInspections(HashCodeOverrideInspection().also { it.m_allowedSuperHashMap = true })
+        myFixture.testHighlighting(false, false, true)
+    }
+
+    fun testMapOfOverrided() {
+        myFixture.configureByFile("MapOfHashMapOverrided.java")
         myFixture.enableInspections(HashCodeOverrideInspection().also { it.m_allowedSuperHashMap = false })
         myFixture.testHighlighting(false, false, true)
     }
@@ -32,11 +56,11 @@ class HashCodeOverrideInspectionTest : LightJavaInspectionTestCase() {
     }
 
     override fun getProjectDescriptor(): LightProjectDescriptor {
-        return object : ProjectDescriptor(LanguageLevel.JDK_1_8) {
+        return object : ProjectDescriptor(LanguageLevel.JDK_11) {
             override fun getSdk(): Sdk {
                 return IdeaTestUtil.createMockJdk(
                     JavaVersion.compose(8).toString(),
-                    File("src/test/mockJDK-1.8").toString()
+                    File("src/test/mockJDK-11").toString()
                 )
             }
         }
