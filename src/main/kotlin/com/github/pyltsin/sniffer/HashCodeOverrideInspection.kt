@@ -19,18 +19,23 @@ private const val HASH_CODE_NOT_OVERRIDE_MESSAGE = "hashcode.override.allowed.er
 
 class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
 
-    private val hashMapClasses: Set<String> = setOf(JAVA_UTIL_HASH_MAP, JAVA_UTIL_CONCURRENT_HASH_MAP)
+    private val hashMapClasses: Set<String> =
+        setOf(JAVA_UTIL_HASH_MAP, JAVA_UTIL_CONCURRENT_HASH_MAP, "java.util.LinkedHashMap")
+    private val hashSetClasses: Set<String> = setOf(JAVA_UTIL_HASH_SET, JAVA_UTIL_LINKED_HASH_SET)
 
     var m_allowedSuperHashMap: Boolean = true
     private val streamCollectMatcher: CallMatcher = CallMatcher.instanceCall(JAVA_UTIL_STREAM_STREAM, "collect")
-    private val collectorsHashMapMatchers: CallMatcher = CallMatcher.anyOf(
+    private val collectorsHashMapAndHashSetMatchers: CallMatcher = CallMatcher.anyOf(
         CallMatcher.staticCall(JAVA_UTIL_STREAM_COLLECTORS, "groupingBy"),
         CallMatcher.staticCall(JAVA_UTIL_STREAM_COLLECTORS, "groupingByConcurrent"),
         CallMatcher.staticCall(JAVA_UTIL_STREAM_COLLECTORS, "toMap"),
         CallMatcher.staticCall(JAVA_UTIL_STREAM_COLLECTORS, "toConcurrentMap"),
+        CallMatcher.staticCall(JAVA_UTIL_STREAM_COLLECTORS, "toSet"),
+        CallMatcher.staticCall(JAVA_UTIL_STREAM_COLLECTORS, "toUnmodifiableSet"),
     )
 
     private val mapOf: CallMatcher = CallMatcher.staticCall(JAVA_UTIL_MAP, "of")
+    private val setOf: CallMatcher = CallMatcher.staticCall(JAVA_UTIL_SET, "of")
 
     override fun createOptionsPanel(): JComponent {
         val panel = JPanel(BorderLayout())
@@ -55,23 +60,28 @@ class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
                 if (expression == null) {
                     return
                 }
-                if (expression.classOrAnonymousClassReference?.qualifiedName !in hashMapClasses) {
-                    return
+                val problemClass = findProblemFirstKeyInClasses(expression, hashSetClasses + hashMapClasses)
+                if (problemClass != null) {
+                    registerHashCodeProblem(expression, problemClass)
                 }
-                val typeArguments = expression.classOrAnonymousClassReference?.parameterList?.typeArguments ?: return
-                if (typeArguments.size != 2) {
-                    return
-                }
-                val keyType = typeArguments[0]
-                if (keyType == null || hasOverrideHashCode(keyType)) {
-                    return
-                }
-
-                holder.registerProblem(
-                    expression,
-                    SnifferInspectionBundle.message(HASH_CODE_NOT_OVERRIDE_MESSAGE, keyType.canonicalText)
-                )
             }
+
+            private fun findProblemFirstKeyInClasses(expression: PsiNewExpression, classes: Set<String>): PsiType? {
+                if (expression.classOrAnonymousClassReference?.qualifiedName !in classes) {
+                    return null
+                }
+                val typeArguments =
+                    expression.classOrAnonymousClassReference?.parameterList?.typeArguments ?: return null
+                if (typeArguments.isEmpty()) {
+                    return null
+                }
+                val keyType: PsiType = typeArguments[0]
+                if (hasOverrideHashCode(keyType)) {
+                    return null
+                }
+                return keyType
+            }
+
 
             override fun visitMethodCallExpression(expression: PsiMethodCallExpression?) {
                 super.visitMethodCallExpression(expression)
@@ -81,59 +91,85 @@ class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
                 }
 
                 //Map.of
-                if (mapOf.matches(expression)) {
-                    val hashMapKey = getKeyTypeMethodParameter(expression, setOf(JAVA_UTIL_MAP))
-                    if (hashMapKey != null && !hasOverrideHashCode(hashMapKey)) {
-                        holder.registerProblem(
-                            expression,
-                            SnifferInspectionBundle.message(HASH_CODE_NOT_OVERRIDE_MESSAGE, hashMapKey.canonicalText)
-                        )
-                        return
-                    }
-                }
+                if (registerMapOfProblem(expression)) return
+
+                //Set.of
+                if (registerSetOfProblem(expression)) return
 
                 //Stream.collect
+                registerStreamCollectProblem(expression)
+
+                return
+            }
+
+            private fun registerMapOfProblem(expression: PsiMethodCallExpression): Boolean {
+                if (mapOf.matches(expression)) {
+                    val hashMapKey = findFirstTypeMethodParameter(expression, setOf(JAVA_UTIL_MAP))
+                    if (hashMapKey != null && !hasOverrideHashCode(hashMapKey)) {
+                        registerHashCodeProblem(expression, hashMapKey)
+                        return true
+                    }
+                }
+                return false
+            }
+
+            private fun registerSetOfProblem(expression: PsiMethodCallExpression): Boolean {
+                if (setOf.matches(expression)) {
+                    val hashMapKey = findFirstTypeMethodParameter(expression, setOf(JAVA_UTIL_SET))
+                    if (hashMapKey != null && !hasOverrideHashCode(hashMapKey)) {
+                        registerHashCodeProblem(expression, hashMapKey)
+                        return true
+                    }
+                }
+                return false
+            }
+
+            private fun registerStreamCollectProblem(expression: PsiMethodCallExpression): Boolean {
                 if (!streamCollectMatcher.matches(expression)) {
-                    return
+                    return false
                 }
 
-                val hashMapKey = getKeyTypeMethodParameter(expression, hashMapClasses)
-                //if collect return HashMap
-                if (hashMapKey != null && !hasOverrideHashCode(hashMapKey)
-                ) {
-                    holder.registerProblem(
-                        expression,
-                        SnifferInspectionBundle.message(HASH_CODE_NOT_OVERRIDE_MESSAGE, hashMapKey.canonicalText)
-                    )
-                    return
+                //if collect return known classes: HashMap, HashSet or like this
+                val problemClass = findFirstTypeMethodParameter(expression, hashMapClasses + hashSetClasses)
+                if (problemClass != null && !hasOverrideHashCode(problemClass)) {
+                    registerHashCodeProblem(expression, problemClass)
+                    return true
                 }
 
                 //check known Collectors
                 val expressions = expression.argumentList.expressions
                 if (expressions.size != 1) {
-                    return
+                    return false
                 }
 
                 val collectorExpression = expressions[0]
-                if (!collectorsHashMapMatchers.matches(collectorExpression)) {
-                    return
+                if (!collectorsHashMapAndHashSetMatchers.matches(collectorExpression)) {
+                    return false
                 }
 
-                val collectionKey = getKeyTypeMethodParameter(expression, setOf(JAVA_UTIL_MAP))
+                val collectionKey = findFirstTypeMethodParameter(expression, setOf(JAVA_UTIL_MAP, JAVA_UTIL_SET))
+
                 if (collectionKey != null && !hasOverrideHashCode(collectionKey)) {
-                    holder.registerProblem(
-                        expression,
-                        SnifferInspectionBundle.message(HASH_CODE_NOT_OVERRIDE_MESSAGE, collectionKey.canonicalText)
-                    )
-                    return
-                } else {
-                    return
+                    registerHashCodeProblem(expression, collectionKey)
+                    return true
                 }
+                return false
             }
+
+            private fun registerHashCodeProblem(
+                expression: PsiExpression,
+                collectionKey: PsiType
+            ) {
+                holder.registerProblem(
+                    expression,
+                    SnifferInspectionBundle.message(HASH_CODE_NOT_OVERRIDE_MESSAGE, collectionKey.canonicalText)
+                )
+            }
+
         }
     }
 
-    private fun getKeyTypeMethodParameter(expression: PsiExpression?, expectedClass: Set<String>): PsiType? {
+    private fun findFirstTypeMethodParameter(expression: PsiExpression?, expectedClass: Set<String>): PsiType? {
         if (expression == null) {
             return null
         }
@@ -144,7 +180,7 @@ class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
         val typeMethod = expression.methodExpression.type
         return if (typeMethod is PsiClassType
             && typeMethod.resolve()?.qualifiedName in expectedClass
-            && typeMethod.parameterCount == 2
+            && typeMethod.parameterCount > 0
         ) {
             typeMethod.parameters[0]
         } else {
