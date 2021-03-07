@@ -1,8 +1,12 @@
 <html lang="en">
 <body>
-<b>Sniffer:</b> This inspection reports when class doesn't contain overrided hashcode method and is used in HashMap as a key.<br>
+<b>Sniffer:</b> This inspection reports when class doesn't contain overrided hashcode method and is used in HashMap or HashSet as a key.<br>
 Work with:
 - new HashMap<>()
+- Map.of
+- new HashSet<>()
+- Set.of
+- Stream.Collectors
 <i>Options</i> Allow override in super classes.
 </body>
 </html>

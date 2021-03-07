@@ -11,41 +11,18 @@ import java.io.File
 
 class HashCodeOverrideInspectionTest : LightJavaInspectionTestCase() {
 
-    fun testNewHashMap() {
-        myFixture.configureByFile("NewHashMap.java")
+    fun testHashCode() {
+        myFixture.configureByFile("HashCode.java")
         myFixture.enableInspections(HashCodeOverrideInspection().also { it.m_allowedSuperHashMap = true })
         myFixture.testHighlighting(false, false, true)
     }
 
-    fun testNewHashMapOverrided() {
-        myFixture.configureByFile("NewHashMapOverrided.java")
-        myFixture.enableInspections(HashCodeOverrideInspection().also { it.m_allowedSuperHashMap = false })
-        myFixture.testHighlighting(false, false, true)
-    }
-
-    fun testStream() {
-        myFixture.configureByFile("StreamHashMap.java")
+    fun testHashCodeOverride() {
+        myFixture.configureByFile("HashCodeOverride.java")
         myFixture.enableInspections(HashCodeOverrideInspection().also { it.m_allowedSuperHashMap = true })
         myFixture.testHighlighting(false, false, true)
     }
 
-    fun testStreamOverrided() {
-        myFixture.configureByFile("StreamHashMapOverrided.java")
-        myFixture.enableInspections(HashCodeOverrideInspection().also { it.m_allowedSuperHashMap = false })
-        myFixture.testHighlighting(false, false, true)
-    }
-
-    fun testMapOf() {
-        myFixture.configureByFile("MapOfHashMap.java")
-        myFixture.enableInspections(HashCodeOverrideInspection().also { it.m_allowedSuperHashMap = true })
-        myFixture.testHighlighting(false, false, true)
-    }
-
-    fun testMapOfOverrided() {
-        myFixture.configureByFile("MapOfHashMapOverrided.java")
-        myFixture.enableInspections(HashCodeOverrideInspection().also { it.m_allowedSuperHashMap = false })
-        myFixture.testHighlighting(false, false, true)
-    }
 
     override fun getInspection(): InspectionProfileEntry? {
         return null

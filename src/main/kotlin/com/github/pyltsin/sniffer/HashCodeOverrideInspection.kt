@@ -11,6 +11,7 @@ import com.siyeh.HardcodedMethodConstants
 import com.siyeh.ig.callMatcher.CallMatcher
 import com.siyeh.ig.psiutils.MethodUtils
 import java.awt.BorderLayout
+import java.util.concurrent.ConcurrentMap
 import javax.swing.JComponent
 import javax.swing.JPanel
 
@@ -30,6 +31,7 @@ class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
         CallMatcher.staticCall(JAVA_UTIL_STREAM_COLLECTORS, "groupingByConcurrent"),
         CallMatcher.staticCall(JAVA_UTIL_STREAM_COLLECTORS, "toMap"),
         CallMatcher.staticCall(JAVA_UTIL_STREAM_COLLECTORS, "toConcurrentMap"),
+        CallMatcher.staticCall(JAVA_UTIL_STREAM_COLLECTORS, "toUnmodifiableMap"),
         CallMatcher.staticCall(JAVA_UTIL_STREAM_COLLECTORS, "toSet"),
         CallMatcher.staticCall(JAVA_UTIL_STREAM_COLLECTORS, "toUnmodifiableSet"),
     )
@@ -147,7 +149,12 @@ class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
                     return false
                 }
 
-                val collectionKey = findFirstTypeMethodParameter(expression, setOf(JAVA_UTIL_MAP, JAVA_UTIL_SET))
+                val collectionKey = findFirstTypeMethodParameter(
+                    expression, setOf(
+                        JAVA_UTIL_MAP,
+                        "java.util.concurrent.ConcurrentMap", JAVA_UTIL_SET
+                    )
+                )
 
                 if (collectionKey != null && !hasOverrideHashCode(collectionKey)) {
                     registerHashCodeProblem(expression, collectionKey)
