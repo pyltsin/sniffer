@@ -20,4 +20,14 @@
                          level="WEAK WARNING"
                          implementationClass="com.github.pyltsin.sniffer.HashCodeOverrideInspection"/>
     </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <localInspection language="JAVA"
+                         displayName="Sniffer: Using in parameters the same object"
+                         groupPath="Java"
+                         groupBundle="messages.SnifferInspectionsBundle"
+                         groupKey="group.names.sniffer.probable.bugs"
+                         enabledByDefault="true"
+                         level="WEAK WARNING"
+                         implementationClass="com.github.pyltsin.sniffer.ObjectUsedAsArgumentInspection"/>
+    </extensions>
 </idea-plugin>

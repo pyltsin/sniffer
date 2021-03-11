@@ -11,7 +11,6 @@ import com.siyeh.HardcodedMethodConstants
 import com.siyeh.ig.callMatcher.CallMatcher
 import com.siyeh.ig.psiutils.MethodUtils
 import java.awt.BorderLayout
-import java.util.concurrent.ConcurrentMap
 import javax.swing.JComponent
 import javax.swing.JPanel
 
