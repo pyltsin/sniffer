@@ -26,6 +26,7 @@ class ObjectUsedAsArgumentInspection : AbstractBaseJavaLocalInspectionTool() {
                         ?: return
 
                 val foundProblem = expression.argumentList.expressions
+                    .asSequence()
                     .map { it as? PsiReferenceExpression }
                     .filter { it?.textMatches(qualifier) ?: false }
                     .map { it?.advancedResolve(true)?.element as? PsiParameter }
