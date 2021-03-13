@@ -3,5 +3,6 @@
 # sniffer Changelog
 
 ## [Unreleased]
+## [0.0.2]
 ### Added
-- Initial scaffold created from [IntelliJ Platform Plugin Template](https://github.com/JetBrains/intellij-platform-plugin-template)
+- add inspections "An object is used as an argument to its own method"
