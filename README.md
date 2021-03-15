@@ -5,9 +5,16 @@
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/16305.svg)](https://plugins.jetbrains.com/plugin/16305)
 
 <!-- Plugin description -->
-This plugin suggests few simple inspections:
-- object is used as an argument
-- not overrided hashcode for key in HashMap
+Basic simple static analysis. It uses IDEA API.
+
+See inspections: "Settings->Editor/Inspections/Sniffer"
+
+This plugin adds a few simple inspections:
+
+- detect "An object is used as an argument to its own method"
+- detect key in HashSet, HashMap, where hashcode is not overrided
+
+
 <!-- Plugin description end -->
 
 ## Installation

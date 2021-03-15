@@ -3,6 +3,9 @@
 # sniffer Changelog
 
 ## [Unreleased]
+## [0.0.3]
+### Added
+- added the icon
 ## [0.0.2]
 ### Added
 - add inspections "An object is used as an argument to its own method"

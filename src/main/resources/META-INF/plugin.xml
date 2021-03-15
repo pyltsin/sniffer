@@ -8,7 +8,12 @@
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.java</depends>
 
-    <description><![CDATA[Basic sniffer. Using for finding a strange part of codes]]></description>
+    <description><![CDATA[Basic static analysis. It uses IDEA API.
+Actual features:
+    - detect "An object is used as an argument to its own method"
+    - detect key in HashSet, HashMap, where hashcode is not overrided
+See inspections: "Settings->Editor/Inspections/Sniffer"
+]]></description>
 
     <extensions defaultExtensionNs="com.intellij">
         <localInspection language="JAVA"
