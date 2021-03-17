@@ -23,7 +23,7 @@ See inspections: "Settings->Editor/Inspections/Sniffer"
                          groupKey="group.names.sniffer.probable.bugs"
                          enabledByDefault="true"
                          level="WEAK WARNING"
-                         implementationClass="com.github.pyltsin.sniffer.HashCodeOverrideInspection"/>
+                         implementationClass="com.github.pyltsin.sniffer.EqualsHashCodeOverrideInspection"/>
     </extensions>
     <extensions defaultExtensionNs="com.intellij">
         <localInspection language="JAVA"

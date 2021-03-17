@@ -17,7 +17,7 @@ import javax.swing.JPanel
 private const val HASH_CODE_NOT_OVERRIDE_MESSAGE = "hashcode.override.allowed.error"
 
 
-class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
+class EqualsHashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
 
     private val hashMapClasses: Set<String> =
         setOf(JAVA_UTIL_HASH_MAP, JAVA_UTIL_CONCURRENT_HASH_MAP, "java.util.LinkedHashMap")
@@ -77,7 +77,7 @@ class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
                     return null
                 }
                 val keyType: PsiType = typeArguments[0]
-                if (hasOverrideHashCode(keyType)) {
+                if (hasOverrideEqualsHashCode(keyType)) {
                     return null
                 }
                 return keyType
@@ -106,7 +106,7 @@ class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
             private fun registerMapOfProblem(expression: PsiMethodCallExpression): Boolean {
                 if (mapOf.matches(expression)) {
                     val hashMapKey = findFirstTypeMethodParameter(expression, setOf(JAVA_UTIL_MAP))
-                    if (hashMapKey != null && !hasOverrideHashCode(hashMapKey)) {
+                    if (hashMapKey != null && !hasOverrideEqualsHashCode(hashMapKey)) {
                         registerHashCodeProblem(expression, hashMapKey)
                         return true
                     }
@@ -117,7 +117,7 @@ class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
             private fun registerSetOfProblem(expression: PsiMethodCallExpression): Boolean {
                 if (setOf.matches(expression)) {
                     val hashMapKey = findFirstTypeMethodParameter(expression, setOf(JAVA_UTIL_SET))
-                    if (hashMapKey != null && !hasOverrideHashCode(hashMapKey)) {
+                    if (hashMapKey != null && !hasOverrideEqualsHashCode(hashMapKey)) {
                         registerHashCodeProblem(expression, hashMapKey)
                         return true
                     }
@@ -132,7 +132,7 @@ class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
 
                 //if collect return known classes: HashMap, HashSet or like this
                 val problemClass = findFirstTypeMethodParameter(expression, hashMapClasses + hashSetClasses)
-                if (problemClass != null && !hasOverrideHashCode(problemClass)) {
+                if (problemClass != null && !hasOverrideEqualsHashCode(problemClass)) {
                     registerHashCodeProblem(expression, problemClass)
                     return true
                 }
@@ -155,7 +155,7 @@ class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
                     )
                 )
 
-                if (collectionKey != null && !hasOverrideHashCode(collectionKey)) {
+                if (collectionKey != null && !hasOverrideEqualsHashCode(collectionKey)) {
                     registerHashCodeProblem(expression, collectionKey)
                     return true
                 }
@@ -194,14 +194,24 @@ class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
         }
     }
 
-    private fun hasOverrideHashCode(psiType: PsiType): Boolean {
+    private fun hasOverrideEqualsHashCode(psiType: PsiType): Boolean {
         val psiClass = PsiTypesUtil.getPsiClass(psiType)
-        val methods: Array<PsiMethod> =
-            //todo add check equals override
+        val hashCodes: Array<PsiMethod> =
             psiClass?.findMethodsByName(HardcodedMethodConstants.HASH_CODE, m_allowedSuperHashMap) ?: arrayOf()
-        return methods
+        val hasHashCode = hashCodes
             .asSequence()
             .filter { MethodUtils.isHashCode(it) }
+            .filter { it.containingClass?.qualifiedName != JAVA_LANG_OBJECT }
+            .any()
+        if (!hasHashCode) {
+            return false
+        }
+        val equals: Array<PsiMethod> =
+            psiClass?.findMethodsByName(HardcodedMethodConstants.EQUALS, m_allowedSuperHashMap) ?: arrayOf()
+
+        return equals
+            .asSequence()
+            .filter { MethodUtils.isEquals(it) }
             .filter { it.containingClass?.qualifiedName != JAVA_LANG_OBJECT }
             .any()
     }

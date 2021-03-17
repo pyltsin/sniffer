@@ -9,17 +9,17 @@ import com.intellij.util.lang.JavaVersion
 import com.siyeh.ig.LightJavaInspectionTestCase
 import java.io.File
 
-class HashCodeOverrideInspectionTest : LightJavaInspectionTestCase() {
+class EqualsHashCodeOverrideInspectionTest : LightJavaInspectionTestCase() {
 
-    fun testHashCode() {
+    fun testEqualsHashCode() {
         myFixture.configureByFile("HashCode.java")
-        myFixture.enableInspections(HashCodeOverrideInspection().also { it.m_allowedSuperHashMap = true })
+        myFixture.enableInspections(EqualsHashCodeOverrideInspection().also { it.m_allowedSuperHashMap = true })
         myFixture.testHighlighting(false, false, true)
     }
 
-    fun testHashCodeOverride() {
+    fun testEqualsHashCodeOverride() {
         myFixture.configureByFile("HashCodeOverride.java")
-        myFixture.enableInspections(HashCodeOverrideInspection().also { it.m_allowedSuperHashMap = true })
+        myFixture.enableInspections(EqualsHashCodeOverrideInspection().also { it.m_allowedSuperHashMap = true })
         myFixture.testHighlighting(false, false, true)
     }
 
