@@ -197,6 +197,7 @@ class HashCodeOverrideInspection : AbstractBaseJavaLocalInspectionTool() {
     private fun hasOverrideHashCode(psiType: PsiType): Boolean {
         val psiClass = PsiTypesUtil.getPsiClass(psiType)
         val methods: Array<PsiMethod> =
+            //todo add check equals override
             psiClass?.findMethodsByName(HardcodedMethodConstants.HASH_CODE, m_allowedSuperHashMap) ?: arrayOf()
         return methods
             .asSequence()
