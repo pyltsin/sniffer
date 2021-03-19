@@ -12,7 +12,7 @@ See inspections: "Settings->Editor/Inspections/Sniffer"
 This plugin adds a few simple inspections:
 
 - detect "An object is used as an argument to its own method"
-- detect key in HashSet, HashMap, where hashcode is not overrided
+- detect key in HashSet, HashMap, where hashcode and equals is not overrided
 
 
 <!-- Plugin description end -->
