@@ -11,9 +11,14 @@
     <description><![CDATA[Basic static analysis. It uses IDEA API.
 Actual features:
     - detect "An object is used as an argument to its own method"
-    - detect key in HashSet, HashMap, where hashcode is not overrided
+    - detect key in HashSet, HashMap, where hashcode or equals is not overrided
 See inspections: "Settings->Editor/Inspections/Sniffer"
 ]]></description>
+
+    <change-notes>
+        0.0.10
+        - add checking equals with hashCode
+    </change-notes>
 
     <extensions defaultExtensionNs="com.intellij">
         <localInspection language="JAVA"
