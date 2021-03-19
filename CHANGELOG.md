@@ -3,7 +3,10 @@
 # sniffer Changelog
 
 ## [Unreleased]
-## [0.0.3]
+## [0.0.9]
+### Added
+- check equals with hashcode
+## [0.0.8]
 ### Added
 - added the icon
 ## [0.0.2]
