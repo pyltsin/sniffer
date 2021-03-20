@@ -1,5 +1,6 @@
-package com.github.pyltsin.sniffer
+package com.github.pyltsin.sniffer.inspections
 
+import com.github.pyltsin.sniffer.utils.SnifferInspectionBundle
 import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder

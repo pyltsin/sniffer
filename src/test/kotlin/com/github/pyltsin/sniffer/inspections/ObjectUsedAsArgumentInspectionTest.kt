@@ -1,4 +1,4 @@
-package com.github.pyltsin.sniffer
+package com.github.pyltsin.sniffer.inspections
 
 import com.intellij.codeInspection.InspectionProfileEntry
 import com.intellij.openapi.projectRoots.Sdk

@@ -44,6 +44,11 @@ changelog {
     groups = emptyList()
 }
 
+//dependencies {
+//    testImplementation(platform("org.junit:junit-bom:5.7.1"))
+//    testImplementation("org.junit.jupiter:junit-jupiter")
+//}
+
 tasks {
     // Set the compatibility versions to 1.8
     withType<JavaCompile> {

@@ -1,4 +1,4 @@
-package com.github.pyltsin.sniffer
+package com.github.pyltsin.sniffer.utils
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.PropertyKey
