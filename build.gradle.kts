@@ -44,10 +44,9 @@ changelog {
     groups = emptyList()
 }
 
-//dependencies {
-//    testImplementation(platform("org.junit:junit-bom:5.7.1"))
-//    testImplementation("org.junit.jupiter:junit-jupiter")
-//}
+dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
+}
 
 tasks {
     // Set the compatibility versions to 1.8
