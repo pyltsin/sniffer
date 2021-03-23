@@ -40,4 +40,14 @@ See inspections: "Settings->Editor/Inspections/Sniffer"
                          level="WEAK WARNING"
                          implementationClass="com.github.pyltsin.sniffer.ObjectUsedAsArgumentInspection"/>
     </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <localInspection language="JAVA"
+                         displayName="Sniffer: Method's name start with get and return Optional"
+                         groupPath="Java"
+                         groupBundle="messages.SnifferInspectionsBundle"
+                         groupKey="group.names.sniffer.probable.bugs"
+                         enabledByDefault="true"
+                         level="WEAK WARNING"
+                         implementationClass="com.github.pyltsin.sniffer.GetReturnOptionalInspection"/>
+    </extensions>
 </idea-plugin>

@@ -9,7 +9,7 @@ import com.intellij.util.lang.JavaVersion
 import com.siyeh.ig.LightJavaInspectionTestCase
 import java.io.File
 
-class ObjectUsedAsArgumentInspectionTest : LightJavaInspectionTestCase() {
+class GetReturnOptionalInspectionTest : LightJavaInspectionTestCase() {
 
     fun test() {
         myFixture.configureByFile("GetReturnOptional.java")
@@ -17,11 +17,11 @@ class ObjectUsedAsArgumentInspectionTest : LightJavaInspectionTestCase() {
     }
 
     override fun getInspection(): InspectionProfileEntry {
-        return ObjectUsedAsArgumentInspection()
+        return GetReturnOptionalInspection()
     }
 
     override fun getTestDataPath(): String {
-        return "src/test/testData/objectUsedAsArgument"
+        return "src/test/testData/getReturnOptional"
     }
 
     override fun getProjectDescriptor(): LightProjectDescriptor {
