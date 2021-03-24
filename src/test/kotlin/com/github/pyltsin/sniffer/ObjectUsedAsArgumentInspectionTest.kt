@@ -12,7 +12,7 @@ import java.io.File
 class ObjectUsedAsArgumentInspectionTest : LightJavaInspectionTestCase() {
 
     fun test() {
-        myFixture.configureByFile("GetReturnOptional.java")
+        myFixture.configureByFile("ObjectAsArgument.java")
         myFixture.testHighlighting(false, false, true)
     }
 
