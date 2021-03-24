@@ -44,6 +44,10 @@ changelog {
     groups = emptyList()
 }
 
+dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.32")
+}
+
 tasks {
     // Set the compatibility versions to 1.8
     withType<JavaCompile> {
