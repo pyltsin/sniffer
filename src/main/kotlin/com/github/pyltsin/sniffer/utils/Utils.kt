@@ -4,12 +4,12 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.min
 
+//todo test
 fun main() {
     println(
         optimalPair(
-            listOf("atestA", "atestB", "atestC", "atestD", "atestFD"),
-            listOf("testFDc", "testAc", "testCc", "testBc", "testDc"),
-            maxSize = 1
+            listOf("xa", "xb"),
+            listOf("b", "a")
         )
     )
 }
@@ -46,13 +46,19 @@ private fun <T> swap(list: java.util.ArrayList<T>, i: Int, j: Int) {
     list[j] = temp
 }
 
-fun optimalPair(s1: List<String>, s2: List<String>, maxSize: Int = 4, maxLength: Int = 3): OptimalResult? {
+fun optimalPair(
+    s1: List<String>,
+    s2: List<String>,
+    maxSize: Int = 4,
+    maxLength: Int = 3,
+    ignoreCase: Boolean = true
+): OptimalResult? {
     if (s1.size != s2.size) {
         return null
     }
     val previousDistance = s1.zip(s2)
         .asSequence()
-        .map { levenshteinDistanceWithLimit(it.first, it.second) }
+        .map { levenshteinDistanceWithLimit(it.first, it.second, ignoreCase) }
         .sum()
 
     if (s1.size > maxSize) {
@@ -64,7 +70,7 @@ fun optimalPair(s1: List<String>, s2: List<String>, maxSize: Int = 4, maxLength:
         .map { nextPermutation ->
             val zip = nextPermutation.zip(s2)
             val levenshtein = zip.asSequence()
-                .map { levenshteinDistance(it.first, it.second) }
+                .map { levenshteinDistanceWithLimit(it.first, it.second, ignoreCase) }
                 .sum()
             OptimalResult(
                 savedOrder = previousDistance <= levenshtein,
@@ -73,7 +79,7 @@ fun optimalPair(s1: List<String>, s2: List<String>, maxSize: Int = 4, maxLength:
                 newOrder = zip
             )
         }
-        .minBy { it.nextDistance }
+        .minByOrNull { it.nextDistance }
 }
 
 private fun findGreedy(
@@ -93,7 +99,7 @@ private fun findGreedy(
             val second: Pair<String, Int> = iter2.asSequence()
                 .filter { it.length >= maxLength && j == 0 }
                 .map { Pair(it, levenshteinDistance(first, it)) }
-                .minBy { it.second } ?: continue
+                .minByOrNull { it.second } ?: continue
             val findPair = Pair(first, second.first)
             pairs.add(findPair)
         }
@@ -122,13 +128,16 @@ data class OptimalResult(
 )
 
 fun levenshteinDistanceWithLimit(
-    s1: String,
-    s2: String,
+    t1: String,
+    t2: String,
+    ignoreCase: Boolean = true,
     insertPrice: Int = 1,
     removePrice: Int = 1,
-    replacePrice: Int = 3,
-    minLength: Int = 3
+    replacePrice: Int = 2,
+    minLength: Int = 0,
 ): Int {
+    val s1 = if (ignoreCase) t1.toLowerCase() else t1
+    val s2 = if (ignoreCase) t2.toLowerCase() else t2
     if (s1.length <= minLength && s2.length < minLength) {
         return 0
     }
@@ -146,9 +155,9 @@ fun levenshteinDistance(
     s2: String,
     insertPrice: Int = 1,
     removePrice: Int = 1,
-    replacePrice: Int = 3
+    replacePrice: Int = 2
 ): Int {
-    // memoize only previous line of distance matrix
+    // memorize only previous line of distance matrix
     var prev = IntArray(s2.length + 1)
 
     for (j in 0 until s2.length + 1) {

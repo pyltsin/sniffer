@@ -12,6 +12,7 @@
 Actual features:
     - detect "An object is used as an argument to its own method"
     - detect key in HashSet, HashMap, where hashcode or equals is not overrided
+    - detect method, which returns Optional and starts with "get"
 See inspections: "Settings->Editor/Inspections/Sniffer"
 ]]></description>
 
@@ -28,7 +29,7 @@ See inspections: "Settings->Editor/Inspections/Sniffer"
                          groupKey="group.names.sniffer.probable.bugs"
                          enabledByDefault="true"
                          level="WEAK WARNING"
-                         implementationClass="com.github.pyltsin.sniffer.EqualsHashCodeOverrideInspection"/>
+                         implementationClass="com.github.pyltsin.sniffer.inspections.EqualsHashCodeOverrideInspection"/>
     </extensions>
     <extensions defaultExtensionNs="com.intellij">
         <localInspection language="JAVA"
@@ -38,7 +39,7 @@ See inspections: "Settings->Editor/Inspections/Sniffer"
                          groupKey="group.names.sniffer.probable.bugs"
                          enabledByDefault="true"
                          level="WEAK WARNING"
-                         implementationClass="com.github.pyltsin.sniffer.ObjectUsedAsArgumentInspection"/>
+                         implementationClass="com.github.pyltsin.sniffer.inspections.ObjectUsedAsArgumentInspection"/>
     </extensions>
     <extensions defaultExtensionNs="com.intellij">
         <localInspection language="JAVA"
@@ -48,6 +49,16 @@ See inspections: "Settings->Editor/Inspections/Sniffer"
                          groupKey="group.names.sniffer.probable.bugs"
                          enabledByDefault="true"
                          level="WEAK WARNING"
-                         implementationClass="com.github.pyltsin.sniffer.GetReturnOptionalInspection"/>
+                         implementationClass="com.github.pyltsin.sniffer.inspections.GetReturnOptionalInspection"/>
+    </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <localInspection language="JAVA"
+                         displayName="Sniffer: Mixed parameters by names"
+                         groupPath="Java"
+                         groupBundle="messages.SnifferInspectionsBundle"
+                         groupKey="group.names.sniffer.probable.bugs"
+                         enabledByDefault="true"
+                         level="WEAK WARNING"
+                         implementationClass="com.github.pyltsin.sniffer.inspections.MixedParametersInspection"/>
     </extensions>
 </idea-plugin>
