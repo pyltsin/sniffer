@@ -18,7 +18,6 @@ class ObjectUsedAsArgumentInspection : AbstractBaseJavaLocalInspectionTool() {
     ): PsiElementVisitor {
         return object : JavaElementVisitor() {
 
-
             override fun visitMethodCallExpression(expression: PsiMethodCallExpression?) {
                 super.visitMethodCallExpression(expression)
                 val qualifier = (expression?.methodExpression?.qualifier as? PsiReferenceExpression) ?: return
