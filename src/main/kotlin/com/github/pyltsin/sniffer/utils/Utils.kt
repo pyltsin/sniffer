@@ -4,16 +4,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.min
 
-//todo test
-fun main() {
-    println(
-        optimalPair(
-            listOf("xa", "xb"),
-            listOf("b", "a")
-        )
-    )
-}
-
 fun <T> List<T>.allPermutations() = sequence<List<T>> {
     val source = this@allPermutations
     val next = ArrayList(source)
@@ -134,18 +124,12 @@ fun levenshteinDistanceWithLimit(
     insertPrice: Int = 1,
     removePrice: Int = 1,
     replacePrice: Int = 2,
-    minLength: Int = 0,
+    minLength: Int = 1,
 ): Int {
     val s1 = if (ignoreCase) t1.toLowerCase() else t1
     val s2 = if (ignoreCase) t2.toLowerCase() else t2
-    if (s1.length <= minLength && s2.length < minLength) {
+    if (s1.length <= minLength || s2.length < minLength) {
         return 0
-    }
-    if (s1.length <= minLength) {
-        return (s2.length - s1.length) * insertPrice
-    }
-    if (s2.length <= minLength) {
-        return (-s2.length + s1.length) * removePrice
     }
     return levenshteinDistance(s1, s2, insertPrice, removePrice, replacePrice)
 }
