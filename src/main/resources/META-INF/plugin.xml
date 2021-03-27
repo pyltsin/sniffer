@@ -61,4 +61,14 @@ See inspections: "Settings->Editor/Inspections/Sniffer"
                          level="WEAK WARNING"
                          implementationClass="com.github.pyltsin.sniffer.inspections.MixedParametersInspection"/>
     </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <localInspection language="JAVA"
+                         displayName="Sniffer: Ternary operator always return the same value"
+                         groupPath="Java"
+                         groupBundle="messages.SnifferInspectionsBundle"
+                         groupKey="group.names.sniffer.probable.bugs"
+                         enabledByDefault="true"
+                         level="WEAK WARNING"
+                         implementationClass="com.github.pyltsin.sniffer.inspections.TernaryConstantValueInspection"/>
+    </extensions>
 </idea-plugin>
