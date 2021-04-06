@@ -3,6 +3,7 @@ package com.github.pyltsin.sniffer.debugger
 import com.intellij.debugger.actions.DebuggerAction
 import com.intellij.debugger.engine.JavaValue
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.xdebugger.XDebugSession
@@ -21,7 +22,7 @@ class TransactionStatusAction : DebuggerAction() {
     private var text: String = ""
     override fun actionPerformed(e: AnActionEvent) {
         val currentSession = getCurrentSession(e)
-        currentSession?.ui.component.
+        ToolWindowManager.getInstance(e.project!!).getToolWindow("TransactionView")?.show()
     }
 
     override fun update(e: AnActionEvent) {
@@ -53,6 +54,7 @@ class TransactionStatusAction : DebuggerAction() {
             if (text == "test") {
                 e.presentation.icon = SnifferIcons.STOP
                 text = ""
+                enable(e)
             }
             return
         }
@@ -82,13 +84,18 @@ class TransactionStatusAction : DebuggerAction() {
 
     }
 
+    private fun enable(e: AnActionEvent) {
+        e.presentation.isEnabled = true
+        foundedSpring = true
+    }
+
     private fun getCurrentSession(e: AnActionEvent): XDebugSession? {
         val project = e.project
         return if (project == null) null else XDebuggerManager.getInstance(project).currentSession
     }
 
     private fun disable(e: AnActionEvent) {
-        e.presentation.isEnabled = false
+//        e.presentation.isEnabled = false
         foundedSpring = false
     }
 }

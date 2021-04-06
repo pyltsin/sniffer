@@ -62,6 +62,10 @@ See inspections: "Settings->Editor/Inspections/Sniffer"
                          enabledByDefault="true"
                          level="WEAK WARNING"
                          implementationClass="com.github.pyltsin.sniffer.inspections.MixedParametersInspection"/>
+
+        <toolWindow id="TransactionView" secondary="true" icon="AllIcons.General.Modified" anchor="right"
+                    factoryClass="com.github.pyltsin.sniffer.ui.MyToolWindowFactory"/>
+
     </extensions>
     <actions>
         <action id="TransactionStatusAction"
