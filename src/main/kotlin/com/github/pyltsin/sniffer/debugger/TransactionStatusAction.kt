@@ -1,11 +1,14 @@
 package com.github.pyltsin.sniffer.debugger
 
+import com.github.pyltsin.sniffer.ui.TransactionDebugUpdateListener.TransactionDebugUpdate
 import com.intellij.debugger.actions.DebuggerAction
 import com.intellij.debugger.engine.JavaValue
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.ui.content.Content
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.XDebuggerManager
 import com.intellij.xdebugger.XSourcePosition
@@ -22,7 +25,12 @@ class TransactionStatusAction : DebuggerAction() {
     private var text: String = ""
     override fun actionPerformed(e: AnActionEvent) {
         val currentSession = getCurrentSession(e)
-        ToolWindowManager.getInstance(e.project!!).getToolWindow("TransactionView")?.show()
+        val project = e.project!!
+        val toolWindow: ToolWindow =
+            ToolWindowManager.getInstance(project).getToolWindow("TransactionView") ?: return
+        toolWindow.show()
+        project.messageBus.syncPublisher(TransactionDebugUpdate).setData(mapOf(Pair("1", "1"), Pair("2", "1")))
+        val content: Content? = toolWindow.contentManager.getContent(0)
     }
 
     override fun update(e: AnActionEvent) {
@@ -50,7 +58,8 @@ class TransactionStatusAction : DebuggerAction() {
             return
         }
         if (currentSession.currentStackFrame?.sourcePosition == null ||
-            currentSourcePosition == currentSession.currentStackFrame?.sourcePosition) {
+            currentSourcePosition == currentSession.currentStackFrame?.sourcePosition
+        ) {
             if (text == "test") {
                 e.presentation.icon = SnifferIcons.STOP
                 text = ""
