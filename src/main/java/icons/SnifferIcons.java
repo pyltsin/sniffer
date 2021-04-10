@@ -21,5 +21,7 @@ import javax.swing.*;
 
 public interface SnifferIcons {
   Icon RUNNING = IconLoader.getIcon("active.svg");
+  Icon ERROR = IconLoader.getIcon("active.svg");
+  Icon NOT_ALLOWED = IconLoader.getIcon("active.svg");
   Icon STOP = IconLoader.getIcon("stop.svg");
 }
