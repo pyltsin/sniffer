@@ -2,6 +2,7 @@
 
 package com.github.pyltsin.sniffer.ui;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.pom.Navigatable;
@@ -24,6 +25,7 @@ public class MyToolWindow {
     private JScrollPane pane;
     private JButton deleteButton;
     private JButton clearButton;
+    private JButton goToButton;
     private final ConcurrentHashMap<String, ViewModel> data = new ConcurrentHashMap<>();
 
     public MyToolWindow(ToolWindow toolWindow, @NotNull Project project) {
@@ -60,6 +62,18 @@ public class MyToolWindow {
             model.setRowCount(0);
         });
 
+        goToButton.addActionListener(e -> {
+            final Object selectedObject = comboBox1.getSelectedItem();
+            if (selectedObject == null) {
+                return;
+            }
+            final int index = comboBox1.getSelectedIndex();
+            final ViewModel viewmodel = (ViewModel) selectedObject;
+            if (viewmodel.element.canNavigateToSource()) {
+                viewmodel.element.navigate(true);
+            }
+        });
+
         comboBox1.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 final ViewModel item = (ViewModel) e.getItem();
@@ -78,15 +92,17 @@ public class MyToolWindow {
                 if (selectedItem == null) {
                     return;
                 }
-                updateTable(selectedItem);
+                ApplicationManager.getApplication().invokeLater(() -> updateTable(selectedItem));
             }
 
             @Override
             public void createRow(String guid, Navigatable element, String name) {
                 final ViewModel value = new ViewModel(element, name, guid);
                 data.put(guid, value);
-                comboBox1.addItem(value);
-                comboBox1.setSelectedItem(value);
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    comboBox1.addItem(value);
+                    comboBox1.setSelectedItem(value);
+                });
             }
         });
     }

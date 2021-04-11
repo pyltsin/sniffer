@@ -16,7 +16,6 @@ import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
 import com.intellij.xdebugger.frame.XValue
 import com.sun.jdi.BooleanValue
-import com.sun.jdi.ObjectReference
 import com.sun.jdi.StringReference
 import com.sun.jdi.Value
 import icons.SnifferIcons
@@ -30,21 +29,53 @@ const val TRANSACTION_ACTIVE: String =
 
 val PROPERTIES: List<Pair<String, String>> = listOf(
     Pair(
-        "active",
-        "org.springframework.transaction.support.TransactionSynchronizationManager.actualTransactionActive.get()==Boolean.TRUE"
+        "TransactionSynchronizationManager.active",
+        "org.springframework.transaction.support.TransactionSynchronizationManager.actualTransactionActive.get()==null?null:" +
+                "org.springframework.transaction.support.TransactionSynchronizationManager.actualTransactionActive.get().toString()"
     ),
     Pair(
-        "name",
+        "TransactionSynchronizationManager.name",
         "org.springframework.transaction.support.TransactionSynchronizationManager.currentTransactionName.get()"
     ),
     Pair(
-        "readOnly",
-        "org.springframework.transaction.support.TransactionSynchronizationManager.currentTransactionReadOnly.get()==Boolean.TRUE"
+        "TransactionSynchronizationManager.readOnly",
+        "org.springframework.transaction.support.TransactionSynchronizationManager.currentTransactionReadOnly.get()==null?null:" +
+                "org.springframework.transaction.support.TransactionSynchronizationManager.currentTransactionReadOnly.get().toString()"
     ),
     Pair(
-        "IsolationLevel",
+        "TransactionSynchronizationManager.IsolationLevel",
         "org.springframework.transaction.support.TransactionSynchronizationManager.currentTransactionIsolationLevel.get()==null?" +
                 "null:org.springframework.transaction.support.TransactionSynchronizationManager.currentTransactionIsolationLevel.get().toString()"
+    ),
+    Pair(
+        "TransactionAspectSupport.newTransaction",
+        "org.springframework.transaction.interceptor.TransactionAspectSupport.transactionInfoHolder.get()==null?null:" +
+                "Boolean.valueOf(org.springframework.transaction.interceptor.TransactionAspectSupport.transactionInfoHolder.get().transactionStatus.newTransaction).toString()"
+    ),
+    Pair(
+        "TransactionAspectSupport.readOnly",
+        "org.springframework.transaction.interceptor.TransactionAspectSupport.transactionInfoHolder.get()==null?null:" +
+                "Boolean.valueOf(org.springframework.transaction.interceptor.TransactionAspectSupport.transactionInfoHolder.get().transactionStatus.readOnly).toString()"
+    ),
+    Pair(
+        "TransactionAspectSupport.rollbackOnly",
+        "org.springframework.transaction.interceptor.TransactionAspectSupport.transactionInfoHolder.get()==null?null:" +
+                "Boolean.valueOf(org.springframework.transaction.interceptor.TransactionAspectSupport.transactionInfoHolder.get().transactionStatus.rollbackOnly).toString()"
+    ),
+    Pair(
+        "TransactionAspectSupport.newSynchronization",
+        "org.springframework.transaction.interceptor.TransactionAspectSupport.transactionInfoHolder.get()==null?null:" +
+                "Boolean.valueOf(org.springframework.transaction.interceptor.TransactionAspectSupport.transactionInfoHolder.get().transactionStatus.newSynchronization).toString()"
+    ),
+    Pair(
+        "TransactionAspectSupport.completed",
+        "org.springframework.transaction.interceptor.TransactionAspectSupport.transactionInfoHolder.get()==null?null:" +
+                "Boolean.valueOf(org.springframework.transaction.interceptor.TransactionAspectSupport.transactionInfoHolder.get().transactionStatus.completed).toString()"
+    ),
+    Pair(
+        "TransactionAspectSupport.transaction",
+        "org.springframework.transaction.interceptor.TransactionAspectSupport.transactionInfoHolder.get()==null?null:" +
+                "org.springframework.transaction.interceptor.TransactionAspectSupport.transactionInfoHolder.get().transactionStatus.transaction.toString()"
     ),
 )
 
@@ -87,20 +118,19 @@ class TransactionStatusAction : DebuggerAction() {
                             return
                         }
                         val descriptorValue: Value? = result.descriptor.value
+                        var sendingValue = ""
                         if (descriptorValue == null) {
-                            project.messageBus.syncPublisher(TransactionDebugUpdate)
-                                .addData(guid, index, property.first, "null")
+                            sendingValue = "null"
                         }
                         if (descriptorValue is BooleanValue) {
                             val booleanValue = descriptorValue.value()
-                            project.messageBus.syncPublisher(TransactionDebugUpdate)
-                                .addData(guid, index, property.first, booleanValue.toString())
+                            sendingValue = booleanValue.toString()
                         }
                         if (descriptorValue is StringReference) {
-                            val stringValue = descriptorValue.value()
-                            project.messageBus.syncPublisher(TransactionDebugUpdate)
-                                .addData(guid, index, property.first, stringValue)
+                            sendingValue = descriptorValue.value()
                         }
+                        project.messageBus.syncPublisher(TransactionDebugUpdate)
+                            .addData(guid, index, property.first, sendingValue)
                     }
                 }, currentSourcePosition
             )
@@ -117,7 +147,6 @@ class TransactionStatusAction : DebuggerAction() {
         val currentSourcePosition: XSourcePosition? = currentSession.currentStackFrame?.sourcePosition
 
         if (previousSession.get() == currentSession && (previousSourcePosition.get() == currentSourcePosition)) {
-            //last result
             val state = previousState.get()
             if (state != null) {
                 state.invoke(presentation)
