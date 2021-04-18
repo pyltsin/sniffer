@@ -17,6 +17,8 @@ See inspections: "Settings->Editor/Inspections/Sniffer"
 ]]></description>
 
     <change-notes>
+        0.0.11
+        - add checking Spring Transactional
         0.0.10
         - add checking equals with hashCode
     </change-notes>
@@ -30,38 +32,6 @@ See inspections: "Settings->Editor/Inspections/Sniffer"
                          enabledByDefault="true"
                          level="WEAK WARNING"
                          implementationClass="com.github.pyltsin.sniffer.inspections.EqualsHashCodeOverrideInspection"/>
-    </extensions>
-    <extensions defaultExtensionNs="com.intellij">
-        <localInspection language="JAVA"
-                         displayName="Sniffer: Using in parameters the same object"
-                         groupPath="Java"
-                         groupBundle="messages.SnifferInspectionsBundle"
-                         groupKey="group.names.sniffer.probable.bugs"
-                         enabledByDefault="true"
-                         level="WEAK WARNING"
-                         implementationClass="com.github.pyltsin.sniffer.inspections.ObjectUsedAsArgumentInspection"/>
-    </extensions>
-    <extensions defaultExtensionNs="com.intellij">
-        <localInspection language="JAVA"
-                         displayName="Sniffer: Method's name start with get and return Optional"
-                         groupPath="Java"
-                         groupBundle="messages.SnifferInspectionsBundle"
-                         groupKey="group.names.sniffer.probable.bugs"
-                         enabledByDefault="true"
-                         level="WEAK WARNING"
-                         implementationClass="com.github.pyltsin.sniffer.inspections.GetReturnOptionalInspection"/>
-    </extensions>
-    <extensions defaultExtensionNs="com.intellij">
-        <localInspection language="JAVA"
-                         displayName="Sniffer: Mixed parameters by names"
-                         groupPath="Java"
-                         groupBundle="messages.SnifferInspectionsBundle"
-                         groupKey="group.names.sniffer.probable.bugs"
-                         enabledByDefault="true"
-                         level="WEAK WARNING"
-                         implementationClass="com.github.pyltsin.sniffer.inspections.MixedParametersInspection"/>
-    </extensions>
-    <extensions defaultExtensionNs="com.intellij">
         <localInspection language="JAVA"
                          displayName="Sniffer: Ternary operator always return the same value"
                          groupPath="Java"
@@ -70,5 +40,41 @@ See inspections: "Settings->Editor/Inspections/Sniffer"
                          enabledByDefault="true"
                          level="WEAK WARNING"
                          implementationClass="com.github.pyltsin.sniffer.inspections.TernaryConstantValueInspection"/>
+        <localInspection language="JAVA"
+                         displayName="Sniffer: Using in parameters the same object"
+                         groupPath="Java"
+                         groupBundle="messages.SnifferInspectionsBundle"
+                         groupKey="group.names.sniffer.probable.bugs"
+                         enabledByDefault="true"
+                         level="WEAK WARNING"
+                         implementationClass="com.github.pyltsin.sniffer.inspections.ObjectUsedAsArgumentInspection"/>
+        <localInspection language="JAVA"
+                         displayName="Sniffer: Method's name start with get and return Optional"
+                         groupPath="Java"
+                         groupBundle="messages.SnifferInspectionsBundle"
+                         groupKey="group.names.sniffer.probable.bugs"
+                         enabledByDefault="true"
+                         level="WEAK WARNING"
+                         implementationClass="com.github.pyltsin.sniffer.inspections.GetReturnOptionalInspection"/>
+        <localInspection language="JAVA"
+                         displayName="Sniffer: Mixed parameters by names"
+                         groupPath="Java"
+                         groupBundle="messages.SnifferInspectionsBundle"
+                         groupKey="group.names.sniffer.probable.bugs"
+                         enabledByDefault="true"
+                         level="WEAK WARNING"
+                         implementationClass="com.github.pyltsin.sniffer.inspections.MixedParametersInspection"/>
+
+        <toolWindow id="TransactionView" secondary="true" icon="AllIcons.General.Modified" anchor="right"
+                    factoryClass="com.github.pyltsin.sniffer.ui.MyToolWindowFactory"/>
+
     </extensions>
+    <actions>
+        <action id="TransactionStatusAction"
+                class="com.github.pyltsin.sniffer.debugger.TransactionStatusAction"
+                icon="SnifferIcons.RUNNING"
+                text="Current Transaction Status">
+            <add-to-group group-id="XDebugger.ToolWindow.TopToolbar" anchor="last"/>
+        </action>
+    </actions>
 </idea-plugin>
