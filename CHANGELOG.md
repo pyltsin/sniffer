@@ -3,7 +3,7 @@
 # sniffer Changelog
 
 ## [Unreleased]
-## [0.0.11
+## [0.0.11]
 ### Added
 - check transactional
 ## [0.0.9]
