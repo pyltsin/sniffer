@@ -30,14 +30,14 @@ class MixedParametersInspection : AbstractBaseJavaLocalInspectionTool() {
                     return
                 }
                 val methodParameters: List<Argument> = getParameters(expression)
-                val argumentsByType = arguments.groupBy { it.type }
-                val parameterByIndex: Map<Int, List<Argument>> = methodParameters.groupBy { it.index }
-                for (argumentsInType: List<Argument> in argumentsByType.values) {
-                    val parametersInType: List<Argument> = argumentsInType
-                        .mapNotNull { parameterByIndex[it.index] }
+                val parametersByType: Map<PsiType?, List<Argument>> = methodParameters.groupBy { it.type }
+                val argumentByIndex: Map<Int, List<Argument>> = arguments.groupBy { it.index }
+                for (parametersInType: List<Argument> in parametersByType.values) {
+                    val argumentsInType: List<Argument> = parametersInType
+                        .mapNotNull { argumentByIndex[it.index] }
                         .filter { it.size == 1 }
                         .map { it[0] }
-                    if (parametersInType.size != argumentsInType.size) {
+                    if (argumentsInType.size != parametersInType.size) {
                         continue
                     }
 

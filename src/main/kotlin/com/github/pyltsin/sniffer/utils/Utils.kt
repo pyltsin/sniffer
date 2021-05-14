@@ -1,7 +1,6 @@
 package com.github.pyltsin.sniffer.utils
 
-import java.util.*
-import kotlin.collections.ArrayList
+import kotlin.math.abs
 import kotlin.math.min
 
 fun <T> List<T>.allPermutations() = sequence<List<T>> {
@@ -41,7 +40,8 @@ fun optimalPair(
     s2: List<String>,
     maxSize: Int = 4,
     maxLength: Int = 3,
-    ignoreCase: Boolean = true
+    ignoreCase: Boolean = true,
+    maxLevenshtein: Int = 5
 ): OptimalResult? {
     if (s1.size != s2.size) {
         return null
@@ -62,8 +62,9 @@ fun optimalPair(
             val levenshtein = zip.asSequence()
                 .map { levenshteinDistanceWithLimit(it.first, it.second, ignoreCase) }
                 .sum()
+            val savedOrder = previousDistance <= levenshtein || levenshtein >= maxLevenshtein * s1.size
             OptimalResult(
-                savedOrder = previousDistance <= levenshtein,
+                savedOrder = savedOrder,
                 previousDistance = previousDistance,
                 nextDistance = levenshtein,
                 newOrder = zip
@@ -124,12 +125,17 @@ fun levenshteinDistanceWithLimit(
     insertPrice: Int = 1,
     removePrice: Int = 1,
     replacePrice: Int = 2,
+    contains: Int = 3,
     minLength: Int = 1,
 ): Int {
     val s1 = if (ignoreCase) t1.toLowerCase() else t1
     val s2 = if (ignoreCase) t2.toLowerCase() else t2
     if (s1.length <= minLength || s2.length < minLength) {
         return 0
+    }
+    if (t1.startsWith(t2) || t2.startsWith(t1)) {
+        /// contains - assuming, not sure
+        return abs(t1.length - t2.length) / contains
     }
     return levenshteinDistance(s1, s2, insertPrice, removePrice, replacePrice)
 }
