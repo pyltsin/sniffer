@@ -1,5 +1,3 @@
-import org.jetbrains.changelog.closure
-import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 fun properties(key: String) = project.findProperty(key).toString()
@@ -11,8 +9,6 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.4.32"
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
     id("org.jetbrains.intellij") version "0.7.2"
-    // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
-    id("org.jetbrains.changelog") version "1.1.2"
 }
 
 group = properties("pluginGroup")
@@ -37,13 +33,6 @@ intellij {
     setPlugins(*properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty).toTypedArray())
 }
 
-// Configure gradle-changelog-plugin plugin.
-// Read more: https://github.com/JetBrains/gradle-changelog-plugin
-changelog {
-    version = properties("pluginVersion")
-    groups = emptyList()
-}
-
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.32")
@@ -64,13 +53,6 @@ tasks {
         version(properties("pluginVersion"))
         sinceBuild(properties("pluginSinceBuild"))
         untilBuild(properties("pluginUntilBuild"))
-
-        // Get the latest available change notes from the changelog file
-        changeNotes(
-            closure {
-                changelog.getLatest().toHTML()
-            }
-        )
     }
 
     runPluginVerifier {
@@ -78,7 +60,6 @@ tasks {
     }
 
     publishPlugin {
-        dependsOn("patchChangelog")
         token(System.getenv("PUBLISH_TOKEN"))
         // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:

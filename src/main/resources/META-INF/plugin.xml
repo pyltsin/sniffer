@@ -17,6 +17,8 @@ See inspections: "Settings->Editor/Inspections/Sniffer"
 ]]></description>
 
     <change-notes>
+        0.0.12
+        - improve work with permutation
         0.0.11
         - add checking Spring Transactional
         0.0.10
