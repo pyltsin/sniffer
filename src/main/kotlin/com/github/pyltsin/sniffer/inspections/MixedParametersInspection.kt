@@ -20,6 +20,23 @@ class MixedParametersInspection : AbstractBaseJavaLocalInspectionTool() {
         session: LocalInspectionToolSession
     ): PsiElementVisitor {
         return object : JavaElementVisitor() {
+            override fun visitMethod(method: PsiMethod?) {
+                super.visitMethod(method)
+                if (method == null) {
+                    return
+                }
+                val superSignatures = method.hierarchicalMethodSignature.superSignatures
+                if (superSignatures.isEmpty()) {
+                    return
+                }
+                val parameters = getParameters(method)
+                for (superSignature in superSignatures) {
+                    val superMethod = superSignature.method
+                    val superParameters = this.getParameters(superMethod)
+                    findProblems(parameters, superParameters, method.parameterList)
+                }
+            }
+
             override fun visitMethodCallExpression(expression: PsiMethodCallExpression?) {
                 super.visitMethodCallExpression(expression)
                 if (expression == null || !expression.isValid) {
@@ -30,6 +47,14 @@ class MixedParametersInspection : AbstractBaseJavaLocalInspectionTool() {
                     return
                 }
                 val methodParameters: List<Argument> = getParameters(expression)
+                findProblems(methodParameters, arguments, expression.argumentList)
+            }
+
+            private fun findProblems(
+                methodParameters: List<Argument>,
+                arguments: List<Argument>,
+                expression: PsiElement
+            ) {
                 val parametersByType: Map<PsiType?, List<Argument>> = methodParameters.groupBy { it.type }
                 val argumentByIndex: Map<Int, List<Argument>> = arguments.groupBy { it.index }
                 for (parametersInType: List<Argument> in parametersByType.values) {
@@ -51,9 +76,9 @@ class MixedParametersInspection : AbstractBaseJavaLocalInspectionTool() {
                 }
             }
 
-            private fun registerProblem(expression: PsiMethodCallExpression, optimalPair: OptimalResult) {
+            private fun registerProblem(expression: PsiElement, optimalPair: OptimalResult) {
                 holder.registerProblem(
-                    expression.argumentList,
+                    expression,
                     SnifferInspectionBundle.message(
                         MIXED_MESSAGE, optimalPair.newOrder.joinToString(separator = ",",
                             transform = { pair -> "[argument = " + pair.first + ", parameter = " + pair.second + "]" })
@@ -65,9 +90,12 @@ class MixedParametersInspection : AbstractBaseJavaLocalInspectionTool() {
                 if (expression == null) {
                     return listOf()
                 }
-                val parameters = arrayListOf<Argument>()
-
                 val psiMethod = expression.methodExpression.advancedResolve(true).element as? PsiMethod
+                return getParameters(psiMethod)
+            }
+
+            private fun getParameters(psiMethod: PsiMethod?): ArrayList<Argument> {
+                val parameters = arrayListOf<Argument>()
                 psiMethod?.parameterList?.parameters?.forEachIndexed { index, psiParameter ->
                     run {
                         parameters.add(Argument(index, psiParameter.name, psiParameter.type))
@@ -83,7 +111,7 @@ class MixedParametersInspection : AbstractBaseJavaLocalInspectionTool() {
                 }
                 val arguments = arrayListOf<Argument>()
                 for ((index, argumentExpression) in expression.argumentList.expressions.withIndex()) {
-                    arguments.add(Argument(index, getArgumentName(argumentExpression), getArgumentType(expression)))
+                    arguments.add(Argument(index, getArgumentName(argumentExpression), getArgumentType(argumentExpression)))
                 }
                 arguments.removeIf { it.type == null || it.name == null }
                 return arguments
